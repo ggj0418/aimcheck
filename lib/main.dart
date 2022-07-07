@@ -1,12 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
-void main() {
+Future<void> main() async {
+  // stop splash screen until Future result will be returned
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
+  bool data = await fetchData();
+
+  /***
+   * remove 를 runApp 앞에 작성하면 스플래시 화면이 Fade Out 되고 그 잔상이 1초 정도 지속되다가
+   * 메인 화면으로 넘어가서 굉장히 부자연스럽다.
+   */
   runApp(const MyApp());
+  FlutterNativeSplash.remove();
+}
+
+Future<bool> fetchData() async {
+  bool data = false;
+
+  await Future.delayed(Duration(seconds: 2), () {
+    data = true;
+  });
+
+  return data;
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -49,6 +70,12 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    FlutterNativeSplash.remove();
+  }
 
   void _incrementCounter() {
     setState(() {
